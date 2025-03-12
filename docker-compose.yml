@@ -6,6 +6,15 @@ services:
     container_name: "loan-application-platform-backend"
     environment:
       - BACKEND_PORT=${BACKEND_PORT}
+      - DB_URL=${DB_URL}
+      - DB_PORT=${DB_PORT}
+      - DB_NAME=${DB_NAME}
+      - CACHE_URL=${CACHE_URL}
+      - CACHE_PORT=${CACHE_PORT}
+      - CURRENCY_API_KEY=${CURRENCY_API_KEY}
+      - CURRENCY_API_BASE_URL=${CURRENCY_API_BASE_URL}
+      - CURRENCY_API_EXCHANGE_URI=${CURRENCY_API_EXCHANGE_URI}
+      - CURRENCY_API_CACHE_TTL=${CURRENCY_API_CACHE_TTL}
     ports:
       - "${BACKEND_PORT}:${BACKEND_PORT}"
     depends_on:

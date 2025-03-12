@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import { BaseEntityController } from '../base-entity/base-entity.controller';
 import { ILoanApplication } from './loan-application.interface';
-import { LoanApplicationService } from './loan-application.service';
+import { IEntityService } from '../base-entity/entity-service.interface';
+import { inject, injectable } from 'inversify';
+import { LoanApplicationServiceToken } from '../../di/tokens';
 
+@injectable()
 export class LoanApplicationController extends BaseEntityController<ILoanApplication> {
   protected readonly sortableFields: Array<keyof ILoanApplication> = [
     'loanAmount',
@@ -10,23 +13,25 @@ export class LoanApplicationController extends BaseEntityController<ILoanApplica
     'submissionDate',
   ];
 
-  constructor(entityService: LoanApplicationService) {
+  constructor(
+    @inject(LoanApplicationServiceToken) entityService: IEntityService<ILoanApplication>,
+  ) {
     super(entityService);
   }
 
-  public async save(req: Request, res: Response) {
+  public async insertOne(req: Request, res: Response) {
     const { name, loanAmount, loanTerm, currency } = req.body;
 
     try {
       const loan = { name, loanAmount, loanTerm, currency };
-      const savedLoan = await this.entityService.save(loan);
+      const savedLoan = await this.entityService.insertOne(loan);
       res.status(201).json(savedLoan);
     } catch (error) {
       res.status(500).json({ error: 'Failed to save loan application' });
     }
   }
 
-  public async getLoans(req: Request, res: Response) {
+  public async findAll(req: Request, res: Response) {
     const queryOptions = this.getQueryOptions(req);
 
     try {

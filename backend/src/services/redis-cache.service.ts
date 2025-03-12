@@ -5,7 +5,9 @@ export class RedisCacheService implements ICacheService {
   private client: ReturnType<typeof createClient>;
 
   constructor() {
-    this.client = createClient({ url: process.env.REDIS_URL });
+    const url = process.env.CACHE_URL;
+    if (!url) throw new Error('No cache url was provided in environment variables');
+    this.client = createClient({ url: `${url}:${process.env.CACHE_PORT || '6379'}` });
     this.client.on('error', (err) => console.error('Redis Client Error', err));
     this.client.connect();
   }

@@ -4,8 +4,8 @@ import { IApiService } from '../interfaces/api-service.interface';
 export class AxiosApiService implements IApiService {
   private instance: AxiosInstance;
 
-  constructor(baseURL: string) {
-    this.instance = axios.create({ baseURL });
+  constructor() {
+    this.instance = axios.create();
   }
 
   async get<T>(url: string, config?: AxiosRequestConfig): Promise<T> {

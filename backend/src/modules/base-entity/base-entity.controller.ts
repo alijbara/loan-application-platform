@@ -1,15 +1,15 @@
 import { Request } from 'express';
 import { IQueryOptions } from '../../interfaces/query-options.interface';
-import { IBaseEntityService } from './base-entity-service.interface';
+import { IEntityService } from './entity-service.interface';
 import { IBaseEntity } from './base-entity.interface';
 import { SortOrder } from '../../enums/sort-order.enum';
 import { isValidEnumValue } from '../../util/is-valid-enum-value';
 
 export abstract class BaseEntityController<T extends IBaseEntity> {
-  protected entityService: IBaseEntityService<T>;
+  protected entityService: IEntityService<T>;
   protected abstract readonly sortableFields: Array<keyof T>;
 
-  constructor(entityService: IBaseEntityService<T>) {
+  constructor(entityService: IEntityService<T>) {
     this.entityService = entityService;
   }
 

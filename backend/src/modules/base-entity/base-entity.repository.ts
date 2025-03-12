@@ -10,7 +10,7 @@ export class BaseEntityRepository<T extends IBaseEntity> implements IRepository<
     this.model = model;
   }
 
-  public async save(entity: T): Promise<T> {
+  public async insertOne(entity: T): Promise<T> {
     const newLoanApplication = new this.model(entity);
     return await newLoanApplication.save();
   }
