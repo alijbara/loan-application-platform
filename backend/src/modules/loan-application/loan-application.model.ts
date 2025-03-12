@@ -5,7 +5,7 @@ import { BaseEntitySchema } from '../base-entity/base-entity.model';
 const LoanApplicationSchema = new Schema<ILoanApplication>({
   name: { type: String, required: true },
   loanAmount: { type: Number, required: true },
-  loanAmountGBP: { type: Number, required: true },
+  convertedLoanAmount: { type: Object, required: true },
   loanTerm: { type: Number, required: true },
   currency: { type: String, required: true },
   submissionDate: { type: Date, required: true },
