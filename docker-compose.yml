@@ -1,0 +1,63 @@
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: "loan-application-platform-backend"
+    environment:
+      - BACKEND_PORT=${BACKEND_PORT}
+    ports:
+      - "${BACKEND_PORT}:${BACKEND_PORT}"
+    depends_on:
+      - db
+      - cache
+    networks:
+      - backend-network
+      - frontend-network
+
+  db:
+    image: mongo:7.0
+    environment:
+      - DB_PORT=${DB_PORT}
+    ports:
+      - "${DB_PORT}:${DB_PORT}"
+    volumes:
+      - db-data:/data/db
+    networks:
+      - backend-network
+
+  cache:
+    image: redis:7.2
+    environment:
+      - CACHE_PORT=${CACHE_PORT}
+    ports:
+      - "${CACHE_PORT}:${CACHE_PORT}"
+    volumes:
+      - cache-data:/data
+    networks:
+      - backend-network
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      - FRONTEND_PORT=${FRONTEND_PORT}
+    ports:
+      - "${FRONTEND_PORT}:${FRONTEND_PORT}"
+    expose:
+      - ${FRONTEND_PORT}
+    depends_on:
+      - backend
+    networks:
+      - frontend-network
+
+volumes:
+  db-data:
+  cache-data:
+
+networks:
+  frontend-network:
+    driver: bridge
+  backend-network:
+    driver: bridge
