@@ -8,6 +8,7 @@ const LoanApplicationSchema = new Schema<ILoanApplication>({
   loanAmountGBP: { type: Number, required: true },
   loanTerm: { type: Number, required: true },
   currency: { type: String, required: true },
+  submissionDate: { type: Date, required: true },
 });
 
 const CombinedSchema = new Schema({
