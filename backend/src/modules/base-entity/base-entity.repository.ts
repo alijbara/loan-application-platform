@@ -2,6 +2,7 @@ import { Model } from 'mongoose';
 import { IRepository } from '../../interfaces/repository.interface';
 import { IBaseEntity } from './base-entity.interface';
 import { IQueryOptions } from '../../interfaces/query-options.interface';
+import { DocsWithType } from '../../types/docs-with-total.type';
 
 export class BaseEntityRepository<T extends IBaseEntity> implements IRepository<T> {
   protected model: Model<T>;
@@ -15,7 +16,7 @@ export class BaseEntityRepository<T extends IBaseEntity> implements IRepository<
     return await newLoanApplication.save();
   }
 
-  public async findAll(queryOptions?: IQueryOptions<T>): Promise<T[]> {
+  public async findAll(queryOptions?: IQueryOptions<T>): Promise<DocsWithType<T>> {
     let sortQuery: any = {};
 
     if (queryOptions?.sort) {
@@ -28,6 +29,8 @@ export class BaseEntityRepository<T extends IBaseEntity> implements IRepository<
     if (queryOptions?.skip !== undefined) query.skip(queryOptions?.skip);
     if (queryOptions?.take !== undefined) query.limit(queryOptions?.take);
 
-    return await query.exec();
+    const total = await this.model.countDocuments();
+    const data = await query.exec();
+    return { docs: data, total };
   }
 }

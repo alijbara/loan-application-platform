@@ -2,6 +2,7 @@ import { IQueryOptions } from '../../interfaces/query-options.interface';
 import { IRepository } from '../../interfaces/repository.interface';
 import { IEntityService } from './entity-service.interface';
 import { IBaseEntity } from './base-entity.interface';
+import { DocsWithType } from '../../types/docs-with-total.type';
 
 export abstract class BaseEntityService<T extends IBaseEntity> implements IEntityService<T> {
   protected repository: IRepository<T>;
@@ -18,7 +19,7 @@ export abstract class BaseEntityService<T extends IBaseEntity> implements IEntit
     return await this.repository.insertOne(entity);
   }
 
-  public async findAll(queryOptions?: IQueryOptions<T>): Promise<T[]> {
+  public async findAll(queryOptions?: IQueryOptions<T>): Promise<DocsWithType<T>> {
     return await this.repository.findAll(queryOptions);
   }
 }

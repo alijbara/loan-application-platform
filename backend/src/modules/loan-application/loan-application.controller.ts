@@ -23,9 +23,9 @@ export class LoanApplicationController extends BaseEntityController<ILoanApplica
     const { name, loanAmount, loanTerm, currency } = req.body;
 
     try {
-      const loan = { name, loanAmount, loanTerm, currency };
-      const savedLoan = await this.entityService.insertOne(loan);
-      res.status(201).json(savedLoan);
+      const loanApplication = { name, loanAmount, loanTerm, currency };
+      const savedLoanApplication = await this.entityService.insertOne(loanApplication);
+      res.status(201).json(savedLoanApplication);
     } catch (error) {
       res.status(500).json({ error: 'Failed to save loan application' });
     }
@@ -35,8 +35,8 @@ export class LoanApplicationController extends BaseEntityController<ILoanApplica
     const queryOptions = this.getQueryOptions(req);
 
     try {
-      const loans = await this.entityService.findAll(queryOptions);
-      res.status(200).json(loans);
+      const result = await this.entityService.findAll(queryOptions);
+      res.status(200).json(result);
     } catch (error) {
       res.status(500).json({ error: 'Failed to fetch loans' });
     }
