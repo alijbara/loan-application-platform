@@ -97,7 +97,10 @@ const goToPage = (page: number) => {
       <thead class="bg-gray-80">
         <tr class="border-b-1 border-gray-500">
           <th class="px-6 py-3 text-left">Name</th>
-          <th class="px-6 py-3 text-left">
+          <th
+            @click="sortData('loanAmount')"
+            class="cursor-pointer px-6 py-3 text-left hover:bg-blue-300 hover:opacity-50 hover:text-gray-900"
+          >
             <div class="flex items-center justify-between w-full">
               Loan Term in Months
               <span v-if="sortField === 'loanTerm'" class="ml-2">{{ getSortIndicator('loanTerm') }}</span>
