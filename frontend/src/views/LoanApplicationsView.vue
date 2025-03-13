@@ -1,17 +1,13 @@
 <script lang="ts" setup>
 import { computed, onMounted, ref, watch } from 'vue';
-import { useLoanApplicationStore } from '@/store/loan-application-store';
+import { useLoanApplicationStore } from '@/store/loan-application.store';
 import { useRouter } from 'vue-router';
 import type { LoanApplicationSortableField } from '@/types/loan-application-sortable-field.type';
-import { useToastStore } from '@/store/toast.store';
-import { useSpinnerStore } from '@/store/spinner.store';
 
 const router = useRouter();
 
 // Stores
 const loanApplicationStore = useLoanApplicationStore();
-const toastStore = useToastStore();
-const spinnerStore = useSpinnerStore();
 
 // Sorting state
 const sortField = ref<LoanApplicationSortableField>('submissionDate'); // Default sorting field
@@ -41,18 +37,6 @@ const pageNumbers = computed(() => {
     pages.push(i);
   }
   return pages;
-});
-
-// Show spinner when loading
-const isLoading = computed(() => loanApplicationStore.isLoading);
-watch(isLoading, (newValue) => (newValue ? spinnerStore.show() : spinnerStore.hide()));
-
-// Show error toast on error
-const errorMessage = computed(() => loanApplicationStore.error);
-watch(errorMessage, (newValue) => {
-  if (newValue) {
-    toastStore.show({ message: newValue, type: 'failure' });
-  }
 });
 
 // Fetch loan applications on mount

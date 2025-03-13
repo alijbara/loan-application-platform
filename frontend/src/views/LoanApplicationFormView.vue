@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useLoanApplicationStore } from '@/store/loan-application-store';
-import { useToastStore } from '@/store/toast.store';
+import { useLoanApplicationStore } from '@/store/loan-application.store';
 import { Currency } from '@/enums/currency.enum';
-import { useSpinnerStore } from '@/store/spinner.store';
+import { useCurrencyStore } from '@/store/currency.store';
 
 const router = useRouter();
 
 // Stores
 const loanApplicationStore = useLoanApplicationStore();
-const toastStore = useToastStore();
-const spinnerStore = useSpinnerStore();
+const currencyStore = useCurrencyStore();
 
 // Loan application state
 const name = ref('');
@@ -19,25 +17,20 @@ const loanAmount = ref(0);
 const loanTerm = ref(12);
 const currency = ref(Currency.GBP);
 
-const currencies = Object.values(Currency);
+// Currencies
+const currencies = computed(() => {
+  return currencyStore.currencies;
+});
 
-// Show spinner when loading
-const isLoading = computed(() => loanApplicationStore.isLoading);
-watch(isLoading, (newValue) => (newValue ? spinnerStore.show() : spinnerStore.hide()));
-
-// Show error toast on error
-const errorMessage = computed(() => loanApplicationStore.error);
-watch(errorMessage, (newValue) => {
-  if (newValue) {
-    toastStore.show({ message: newValue, type: 'failure' });
-  }
+// Fetch currencies on mount
+onMounted(async () => {
+  await currencyStore.fetchCurrencies();
 });
 
 // When submitted loan is returned, redirect to the new loan application details page
 const submittedLoanApplication = computed(() => loanApplicationStore.submittedLoanApplication);
 watch(submittedLoanApplication, (newValue) => {
   if (newValue?.id) {
-    toastStore.show({ message: 'Loan application submitted successfully!', type: 'success' });
     router.push(`/loan-applications/${newValue.id}`);
   }
 });

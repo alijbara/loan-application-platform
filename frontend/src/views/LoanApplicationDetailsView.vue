@@ -1,32 +1,16 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue';
-import { useLoanApplicationStore } from '@/store/loan-application-store';
+import { computed, onMounted } from 'vue';
+import { useLoanApplicationStore } from '@/store/loan-application.store';
 import { useRoute, useRouter } from 'vue-router';
-import { useSpinnerStore } from '@/store/spinner.store';
-import { useToastStore } from '@/store/toast.store';
 
 const route = useRoute();
 const router = useRouter();
 
 // Stores
 const loanApplicationStore = useLoanApplicationStore();
-const toastStore = useToastStore();
-const spinnerStore = useSpinnerStore();
 
 // Get loan application from store
 const loanApplication = computed(() => loanApplicationStore.loanApplications.find((l) => l.id === route.params.id));
-
-// Show spinner when loading
-const isLoading = computed(() => loanApplicationStore.isLoading);
-watch(isLoading, (newValue) => (newValue ? spinnerStore.show() : spinnerStore.hide()));
-
-// Show error toast on error
-const errorMessage = computed(() => loanApplicationStore.error);
-watch(errorMessage, (newValue) => {
-  if (newValue) {
-    toastStore.show({ message: newValue, type: 'failure' });
-  }
-});
 
 // Fetch again if loan application not in store (on reload)
 onMounted(() => {
