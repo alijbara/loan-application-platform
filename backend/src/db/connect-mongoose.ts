@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-export function connectMongoose() {
+export function connectDb() {
   const dbPort = process.env.DB_PORT || '27017';
   const dbUrl = process.env.DB_URL;
   if (!dbUrl) throw new Error('No db url was provided in environment variables');

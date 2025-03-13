@@ -27,7 +27,8 @@ export class LoanApplicationController extends BaseEntityController<ILoanApplica
       const savedLoanApplication = await this.entityService.insertOne(loanApplication);
       res.status(201).json(savedLoanApplication);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to save loan application' });
+      console.error(error);
+      res.status(500).json({ message: 'Failed to save loan application' });
     }
   }
 
@@ -38,7 +39,8 @@ export class LoanApplicationController extends BaseEntityController<ILoanApplica
       const result = await this.entityService.findAll(queryOptions);
       res.status(200).json(result);
     } catch (error) {
-      res.status(500).json({ error: 'Failed to fetch loans' });
+      console.error(error);
+      res.status(500).json({ message: 'Failed to fetch loan applications' });
     }
   }
 }

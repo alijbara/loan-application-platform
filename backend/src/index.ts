@@ -1,10 +1,10 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import cors from 'cors';
 import { loanApplicationRouter } from './modules/loan-application/loan-application.routes';
 import { RouteUri } from './enums/route-uri.enum';
-import { connectMongoose } from './db/connect-mongoose';
+import { connectDb } from './db/connect-mongoose';
+import { currencyRouter } from './modules/currency/currency.routes';
 
 dotenv.config();
 
@@ -17,9 +17,10 @@ app.use(express.json());
 
 // Routes
 app.use(RouteUri.API, loanApplicationRouter);
+app.use(RouteUri.API, currencyRouter);
 
 // Database connection
-connectMongoose();
+connectDb();
 
 // Start server
 app.listen(PORT, () => {

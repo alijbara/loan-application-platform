@@ -1,5 +1,4 @@
-import { Currency } from '../enums/currency.enum';
-
 export interface ICurrencyService {
-  convertAmount(amount: number, fromCurrency: Currency, toCurrency: Currency): Promise<number>;
+  convertAmount(amount: number, fromCurrency: string, toCurrency: string): Promise<number>;
+  getCurrencies(): Promise<string[]>;
 }
