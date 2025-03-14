@@ -89,10 +89,10 @@ const goToPage = (page: number) => {
 };
 
 // Format currency
-const formatCurrency = (amount: number) => {
+const formatCurrency = (amount: number, currency: string) => {
   return new Intl.NumberFormat('en-GB', {
     style: 'currency',
-    currency: 'GBP',
+    currency: currency,
     minimumFractionDigits: 2,
   }).format(amount);
 };
@@ -165,9 +165,11 @@ const formatDate = (date: Date | string) => {
           >
             <td class="px-4 py-3 text-sm">{{ loan.name }}</td>
             <td class="px-4 py-3 text-sm">{{ loan.loanTerm }} months</td>
-            <td class="px-4 py-3 text-sm">{{ loan.loanAmount }}</td>
+            <td class="px-4 py-3 text-sm">{{ formatCurrency(loan.loanAmount, loan.currency) }}</td>
             <td class="px-4 py-3 text-sm hidden sm:table-cell">{{ loan.currency }}</td>
-            <td class="px-4 py-3 text-sm hidden md:table-cell">{{ formatCurrency(loan.convertedLoanAmount.GBP) }}</td>
+            <td class="px-4 py-3 text-sm hidden md:table-cell">
+              {{ formatCurrency(loan.convertedLoanAmount.GBP, 'GBP') }}
+            </td>
             <td class="px-4 py-3 text-sm">{{ formatDate(loan.submissionDate) }}</td>
           </tr>
           <tr v-if="loanApplications.length === 0">
