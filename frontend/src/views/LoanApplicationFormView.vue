@@ -17,6 +17,12 @@ const loanAmount = ref(0);
 const loanTerm = ref(12);
 const currency = ref(Currency.GBP);
 
+// Form validation
+const errors = ref({
+  name: '',
+  loanAmount: '',
+});
+
 // Currencies
 const currencies = computed(() => {
   return currencyStore.currencies;
@@ -47,8 +53,29 @@ watch(loanAmount, (newValue) => {
   }
 });
 
+// Validate form
+const validateForm = () => {
+  let isValid = true;
+  errors.value.name = '';
+  errors.value.loanAmount = '';
+
+  if (!name.value.trim()) {
+    errors.value.name = 'Name is required';
+    isValid = false;
+  }
+
+  if (!loanAmount.value || loanAmount.value <= 0) {
+    errors.value.loanAmount = 'Please enter a valid loan amount';
+    isValid = false;
+  }
+
+  return isValid;
+};
+
 // Submit handler
 const submitForm = async () => {
+  if (!validateForm()) return;
+
   if (!name.value || loanAmount.value <= 0) return;
   await loanApplicationStore.submitLoanApplication({
     name: name.value,
@@ -60,81 +87,97 @@ const submitForm = async () => {
 </script>
 
 <template>
-  <section class="grow md:px-16 max-w-4xl mx-auto p-6 h-[calc(100vh-60px)] dark:text-gray-100">
-    <h2 class="text-3xl text-center text-white font-semibold mb-6">Loan Application</h2>
-    <form @submit.prevent="submitForm" class="space-y-6">
-      <!-- Name Field -->
-      <div class="space-y-1">
-        <label for="name" class="inline-block text-sm font-medium">Name</label>
-        <input
-          id="name"
-          v-model="name"
-          type="text"
-          class="block w-full rounded-lg border border-gray-200 px-5 py-3 leading-6 placeholder-gray-500 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 dark:border-gray-600 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500"
-          placeholder="Enter your full name"
-          required
-        />
-      </div>
+  <section class="grow flex items-center justify-center p-4 md:p-8 min-h-[calc(100vh-60px)] dark:text-gray-100">
+    <div class="w-full max-w-xl mx-auto bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-600">
+      <div class="p-6">
+        <h2 class="text-2xl md:text-3xl text-white font-semibold text-center mb-2">Loan Application</h2>
+        <p class="text-gray-500 dark:text-gray-400 text-center mb-6">Fill out the form below to apply for a loan</p>
 
-      <!-- Loan Amount Field -->
-      <div>
-        <label for="loanAmount" class="inline-block text-sm font-medium">Loan Amount</label>
-        <input
-          id="loanAmount"
-          v-model="loanAmount"
-          type="number"
-          min="0"
-          class="block w-full rounded-lg border border-gray-200 px-5 py-3 leading-6 placeholder-gray-500 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 dark:border-gray-600 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500"
-          placeholder="Enter loan amount"
-          required
-        />
-      </div>
+        <form @submit.prevent="submitForm" class="space-y-6">
+          <!-- Name Field -->
+          <div class="space-y-2">
+            <label for="name" class="block text-sm font-medium">Full Name</label>
+            <input
+              id="name"
+              v-model="name"
+              type="text"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="{ 'border-red-500': errors.name }"
+              placeholder="Enter your full name"
+            />
+            <p v-if="errors.name" class="text-sm text-red-500">{{ errors.name }}</p>
+          </div>
 
-      <!-- Loan Term Field -->
-      <div>
-        <label for="loanTerm" class="inline-block text-sm font-medium">Loan Term (Months)</label>
-        <input
-          id="loanTerm"
-          v-model="loanTerm"
-          type="number"
-          min="1"
-          class="block w-full rounded-lg border border-gray-200 px-5 py-3 leading-6 placeholder-gray-500 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 dark:border-gray-600 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500"
-          placeholder="Enter loan term in months"
-          required
-        />
-      </div>
+          <!-- Loan Amount Field -->
+          <div class="space-y-2">
+            <label for="loanAmount" class="block text-sm font-medium">Loan Amount</label>
+            <input
+              id="loanAmount"
+              v-model="loanAmount"
+              type="number"
+              min="0"
+              class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              :class="{ 'border-red-500': errors.loanAmount }"
+              placeholder="0.00"
+            />
+            <p v-if="errors.loanAmount" class="text-sm text-red-500">{{ errors.loanAmount }}</p>
+          </div>
 
-      <!-- Currency Dropdown -->
-      <label for="currency" class="inline-block text-sm font-medium">Currency</label>
-      <div class="relative">
-        <select
-          id="currency"
-          v-model="currency"
-          class="block w-full rounded-lg border border-gray-200 px-5 py-3 leading-6 placeholder-gray-500 focus:border-blue-500 focus:ring-3 focus:ring-blue-500/50 dark:border-gray-600 dark:bg-gray-800 dark:placeholder-gray-400 dark:focus:border-blue-500 appearance-none pr-10"
-          required
-        >
-          <option v-for="curr in currencies" :key="curr" :value="curr">
-            {{ curr }}
-          </option>
-        </select>
-        <div
-          class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 pb-0 text-gray-500 dark:text-gray-400"
-        >
-          <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-          </svg>
-        </div>
+          <!-- Loan Term Field -->
+          <div class="space-y-2">
+            <div class="flex justify-between items-center">
+              <label for="loanTerm" class="block text-sm font-medium">Loan Term</label>
+              <span class="text-sm text-gray-500">{{ loanTerm }} months</span>
+            </div>
+            <input
+              id="loanTerm"
+              v-model="loanTerm"
+              type="range"
+              min="1"
+              max="60"
+              step="1"
+              class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+            />
+            <div class="flex justify-between text-xs text-gray-500">
+              <span>1 month</span>
+              <span>60 months</span>
+            </div>
+          </div>
+          <!-- Currency Dropdown -->
+          <div class="space-y-2">
+            <label for="currency" class="block text-sm font-medium">Currency</label>
+            <div class="relative">
+              <select
+                id="currency"
+                v-model="currency"
+                class="w-full px-3 py-2 border rounded-md appearance-none focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+              >
+                <option v-for="curr in currencies" :key="curr" :value="curr">
+                  {{ curr }}
+                </option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
+                <svg
+                  class="h-5 w-5"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </div>
+            </div>
+          </div>
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            class="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-md transition-colors cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50"
+          >
+            {{ 'Apply for Loan' }}
+          </button>
+        </form>
       </div>
-
-      <!-- Submit Button -->
-      <div class="mt-6 flex justify-center">
-        <button
-          type="submit"
-          class="bg-blue-600 text-white px-6 py-3 rounded-lg text-lg w-full hover:bg-blue-500 transition duration-300 cursor-pointer"
-        >
-          Apply for Loan
-        </button>
-      </div>
-    </form>
+    </div>
   </section>
 </template>
