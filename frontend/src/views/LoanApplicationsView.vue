@@ -87,43 +87,71 @@ const goToPage = (page: number) => {
     currentPage.value = page;
   }
 };
+
+// Format currency
+const formatCurrency = (amount: number) => {
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    minimumFractionDigits: 2,
+  }).format(amount);
+};
+
+// Format date
+const formatDate = (date: Date | string) => {
+  return new Date(date).toLocaleDateString('en-GB', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  });
+};
 </script>
 
 <template>
   <section class="w-full max-w-7xl mx-auto p-4 sm:p-6 space-y-6 dark:text-gray-100 h-[calc(100vh-60px)]">
     <h2 class="text-2xl sm:text-3xl text-center font-semibold mb-4 sm:mb-6">Loan Applications</h2>
+
+    <!-- Responsive table container -->
     <div class="overflow-x-auto rounded-lg shadow-md">
-      <table class="min-w-full bg-gray-800 rounded-lg shadow-md">
-        <thead class="bg-gray-80">
-          <tr class="border-b-1 border-gray-500">
-            <th class="px-6 py-3 text-left">Name</th>
+      <table class="w-full bg-gray-800 border-collapse">
+        <thead class="bg-gray-700 text-gray-200">
+          <tr class="border-b border-gray-600">
+            <th class="px-4 py-3 text-left font-medium text-sm">Name</th>
             <th
               @click="sortData('loanTerm')"
-              class="cursor-pointer px-6 py-3 text-left hover:bg-blue-300 hover:opacity-50 hover:text-gray-900"
+              class="px-4 py-3 text-left font-medium text-sm cursor-pointer hover:bg-gray-600 transition-colors"
             >
-              <div class="flex items-center justify-between w-full">
-                Loan Term in Months
-                <span v-if="sortField === 'loanTerm'" class="ml-2">{{ getSortIndicator('loanTerm') }}</span>
+              <div class="flex items-center space-x-1">
+                <span>Loan Term</span>
+                <div class="flex flex-col ml-1">
+                  <span v-if="sortField === 'loanTerm'" class="ml-2">{{ getSortIndicator('loanTerm') }}</span>
+                </div>
               </div>
             </th>
             <th
               @click="sortData('loanAmount')"
-              class="cursor-pointer px-6 py-3 text-left hover:bg-blue-300 hover:opacity-50 hover:text-gray-900"
+              class="px-4 py-3 text-left font-medium text-sm cursor-pointer hover:bg-gray-600 transition-colors"
             >
-              <div class="flex items-center justify-between w-full">
-                Loan Amount
-                <span v-if="sortField === 'loanAmount'" class="ml-2">{{ getSortIndicator('loanAmount') }}</span>
+              <div class="flex items-center space-x-1">
+                <span>Loan Amount</span>
+                <div class="flex flex-col ml-1">
+                  <span v-if="sortField === 'loanAmount'" class="ml-2">{{ getSortIndicator('loanAmount') }}</span>
+                </div>
               </div>
             </th>
-            <th class="px-6 py-3 text-left">Currency</th>
-            <th class="px-6 py-3 text-left">Loan Value in GBP</th>
+            <th class="px-4 py-3 text-left font-medium text-sm hidden sm:table-cell">Currency</th>
+            <th class="px-4 py-3 text-left font-medium text-sm hidden md:table-cell">Loan Value in GBP</th>
             <th
               @click="sortData('submissionDate')"
-              class="cursor-pointer px-6 py-3 text-left hover:bg-blue-300 hover:opacity-50 hover:text-gray-900"
+              class="px-4 py-3 text-left font-medium text-sm cursor-pointer hover:bg-gray-600 transition-colors"
             >
-              <div class="flex items-center justify-between w-full">
-                Submission Date
-                <span v-if="sortField === 'submissionDate'" class="ml-2">{{ getSortIndicator('submissionDate') }}</span>
+              <div class="flex items-center space-x-1">
+                <span>Submission Date</span>
+                <div class="flex flex-col ml-1">
+                  <span v-if="sortField === 'submissionDate'" class="ml-2">{{
+                    getSortIndicator('submissionDate')
+                  }}</span>
+                </div>
               </div>
             </th>
           </tr>
@@ -133,59 +161,68 @@ const goToPage = (page: number) => {
             v-for="loan in loanApplications"
             :key="loan.id"
             @click="goToLoanDetails(loan.id)"
-            class="hover:bg-blue-300 hover:opacity-50 hover:text-gray-900 cursor-pointer"
+            class="border-b border-gray-700 hover:bg-gray-700 cursor-pointer transition-colors"
           >
-            <td class="px-6 py-4">{{ loan.name }}</td>
-            <td class="px-6 py-4">{{ loan.loanTerm }}</td>
-            <td class="px-6 py-4">{{ loan.loanAmount }}</td>
-            <td class="px-6 py-4">{{ loan.currency }}</td>
-            <td class="px-6 py-4">{{ loan.convertedLoanAmount.GBP }}</td>
-            <td class="px-6 py-4">{{ new Date(loan.submissionDate).toLocaleDateString() }}</td>
+            <td class="px-4 py-3 text-sm">{{ loan.name }}</td>
+            <td class="px-4 py-3 text-sm">{{ loan.loanTerm }} months</td>
+            <td class="px-4 py-3 text-sm">{{ loan.loanAmount }}</td>
+            <td class="px-4 py-3 text-sm hidden sm:table-cell">{{ loan.currency }}</td>
+            <td class="px-4 py-3 text-sm hidden md:table-cell">{{ formatCurrency(loan.convertedLoanAmount.GBP) }}</td>
+            <td class="px-4 py-3 text-sm">{{ formatDate(loan.submissionDate) }}</td>
+          </tr>
+          <tr v-if="loanApplications.length === 0">
+            <td colspan="6" class="px-4 py-6 text-center text-gray-400">No loan applications found</td>
           </tr>
         </tbody>
       </table>
-      <div class="row flex justify-end">
-        <button
-          :disabled="currentPage === 1"
-          @click="goToPage(currentPage - 1)"
-          class="rounded-md rounded-r-none rounded-l-none border-1 border-gray-600 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-gray-600 hover:text-white hover:bg-gray-900 hover:border-gray-200 focus:text-white focus:bg-gray-900 focus:border-gray-200 active:border-gray-400 active:text-white active:bg-gray-800 cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-          type="button"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-            <path
-              fill-rule="evenodd"
-              d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </button>
-        <button
-          v-for="page in pageNumbers"
-          :key="page"
-          :active="currentPage === page"
-          :focus="currentPage === page"
-          @click="goToPage(page)"
-          class="rounded-md rounded-r-none rounded-l-none border-1 border-gray-600 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-gray-600 hover:text-white hover:bg-gray-900 hover:border-gray-200 focus:text-white focus:bg-gray-900 focus:border-gray-200 active:border-gray-400 active:text-white active:bg-gray-800 cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-          type="button"
-        >
-          {{ page }}
-        </button>
-        <button
-          :disabled="currentPage === totalPages"
-          :focus="false"
-          :active="false"
-          @click="goToPage(currentPage + 1)"
-          class="rounded-md rounded-r-none rounded-l-none border-1 border-gray-600 py-2 px-3 text-center text-sm transition-all shadow-sm hover:shadow-lg text-gray-600 hover:text-white hover:bg-gray-900 hover:border-gray-200 focus:text-white focus:bg-gray-900 focus:border-gray-200 active:border-gray-400 active:text-white active:bg-gray-800 cursor-pointer disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
-          type="button"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
-            <path
-              fill-rule="evenodd"
-              d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
-              clip-rule="evenodd"
-            />
-          </svg>
-        </button>
+    </div>
+    <div class="flex flex-col sm:flex-row items-center justify-between gap-4 mt-4">
+      <div class="text-sm text-gray-400">
+        Showing {{ Math.min((currentPage - 1) * pageSize + 1, totalLoanApplications) }} to
+        {{ Math.min(currentPage * pageSize, totalLoanApplications) }} of {{ totalLoanApplications }} entries
+      </div>
+      <div class="flex items-center">
+        <nav class="inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+          <button
+            @click="goToPage(currentPage - 1)"
+            :disabled="currentPage === 1"
+            class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-600 bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+              <path
+                fill-rule="evenodd"
+                d="M11.03 3.97a.75.75 0 0 1 0 1.06l-6.22 6.22H21a.75.75 0 0 1 0 1.5H4.81l6.22 6.22a.75.75 0 1 1-1.06 1.06l-7.5-7.5a.75.75 0 0 1 0-1.06l7.5-7.5a.75.75 0 0 1 1.06 0Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+          <template v-for="(page, index) in pageNumbers" :key="index">
+            <button
+              @click="goToPage(page)"
+              :class="[
+                'relative inline-flex items-center px-4 py-2 border text-sm font-medium',
+                currentPage === page
+                  ? 'z-10 bg-blue-600 border-blue-500 text-white'
+                  : 'bg-gray-800 border-gray-600 text-gray-300 hover:bg-gray-700',
+              ]"
+            >
+              {{ page }}
+            </button>
+          </template>
+          <button
+            @click="goToPage(currentPage + 1)"
+            :disabled="currentPage === totalPages"
+            class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-600 bg-gray-800 text-sm font-medium text-gray-300 hover:bg-gray-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4">
+              <path
+                fill-rule="evenodd"
+                d="M12.97 3.97a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 0 1 0 1.06l-7.5 7.5a.75.75 0 1 1-1.06-1.06l6.22-6.22H3a.75.75 0 0 1 0-1.5h16.19l-6.22-6.22a.75.75 0 0 1 0-1.06Z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </button>
+        </nav>
       </div>
     </div>
   </section>

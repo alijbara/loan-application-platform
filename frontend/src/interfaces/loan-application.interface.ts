@@ -1,12 +1,9 @@
-import type { ConvertedLoanAmount } from '@/types/converted-loan-amount.type';
-import { Currency } from '../enums/currency.enum';
-
 export interface ILoanApplication {
   id: string;
   name: string;
   loanAmount: number;
-  convertedLoanAmount: ConvertedLoanAmount;
+  convertedLoanAmount: Record<string, number>;
   loanTerm: number;
-  currency: Currency;
+  currency: string;
   submissionDate: Date;
 }
